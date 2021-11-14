@@ -1,20 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
-import { Table, Modal, Space } from 'antd';
+import { Table, Modal, Space, Pagination, DatePicker } from 'antd';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { getListCongViec } from '@core/services/API';
+
 import ModalEditStaffInfo from './ModalEditStaffInfo';
 // import { getListStaff } from 'core/services/staff';
 
 function index() {
+  const [productData, setProductData] = useState<any>();
+  const [totalRecord, setTotalRecord] = useState<number>(0);
+  const [pageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [role, setRole] = useState<any>();
   const [listStaff, setListStaff] = useState<any>();
   const [showEditProfileModal, setShowEditProfileModal] = React.useState<boolean>(false);
   const [staffID, setStaffID] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
+  const [sort, setSort] = useState<string>('id_asc');
+
   useEffect(() => {
-    getStaffList();
-  }, []);
+    getCongViecList();
+  }, [currentPage]);
+
+  const getCongViecList = async () => {
+    getListCongViec(currentPage - 1, pageSize, search, sort)
+      .then((resp) => {
+        const data = resp.data;
+        setProductData(data.Data);
+        setTotalRecord(data.TotalRecord);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
 
   const getStaffList = async () => {
     // getListStaff()
@@ -31,19 +52,38 @@ function index() {
     setShowEditProfileModal(true);
     setStaffID(id);
   };
+  const onPagingChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'DisplayName',
+      title: 'Tên công việc',
+      dataIndex: 'tenCongViec',
     },
     {
-      title: 'Address',
-      dataIndex: 'Address',
+      title: 'Định mức khoán',
+      dataIndex: 'dinhMucKhoan',
     },
     {
-      title: 'Last login',
-      dataIndex: 'LastLogin',
+      title: 'Đơn vị khoán',
+      dataIndex: 'donViKhoan',
+    },
+    {
+      title: 'Hệ số khoán',
+      dataIndex: 'heSoKhoan',
+    },
+    {
+      title: 'Định mức lao động',
+      dataIndex: 'dinhMucLaoDong',
+    },
+    {
+      title: 'Đơn giá',
+      dataIndex: 'donGia',
+    },
+    {
+      title: 'Mã công việc',
+      dataIndex: 'maCongViec',
     },
     {
       title: 'Action',
@@ -58,7 +98,7 @@ function index() {
 
   return (
     <>
-      <Layout title={'Staff'}>
+      {/* <Layout title={'Staff'}>
         <div>
           <Table columns={columns} dataSource={listStaff} />
           <Modal
@@ -74,6 +114,20 @@ function index() {
           >
             <ModalEditStaffInfo staffID={staffID} />
           </Modal>
+        </div>
+      </Layout> */}
+
+      <Layout title={'Product'}>
+        <div>{/* <DatePicker onChange={onChange} /> */}</div>
+        <div>
+          <Table columns={columns} dataSource={productData} pagination={false} />
+          <Pagination
+            defaultPageSize={pageSize}
+            defaultCurrent={currentPage}
+            onChange={onPagingChange}
+            current={currentPage}
+            total={totalRecord}
+          />
         </div>
       </Layout>
     </>

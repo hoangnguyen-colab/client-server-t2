@@ -12,3 +12,6 @@ export const getSanPhamNDK = (date: string) => get(`${ENDPOINTS.SANPHAM}/${date}
 export const editSanPham = (params: object, id: string) => post(`${ENDPOINTS.SANPHAM}/edit/${id}`, params);
 export const addSanPham = (params: object) => post(`${ENDPOINTS.SANPHAM}/add`, params);
 export const deleteSanPham = (id: string) => apiClient.delete(`${ENDPOINTS.SANPHAM}/delete/${id}`);
+
+export const getListCongViec = (pageIndex?: number, pageSize?: number, search: string = '', sort: string = 'id_asc') =>
+  get(`${ENDPOINTS.CONGVIEC}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
