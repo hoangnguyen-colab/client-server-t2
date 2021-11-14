@@ -11,32 +11,33 @@ import router from 'next/router';
 
 function index() {
   const [productData, setProductData] = useState<any>();
-  const [totalPage, setTotalPage] = useState<number>(2);
   const [totalRecord, setTotalRecord] = useState<number>(0);
   const [pageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [date, setDate] = useState<string>('20190719');
+  const [search, setSearch] = useState<string>('');
+  const [sort, setSort] = useState<string>('id_asc');
 
   useEffect(() => {
     getProductList();
   }, [currentPage]);
 
   const getProductList = async () => {
-    getListSanPham(currentPage - 1, pageSize)
+    getListSanPham(currentPage - 1, pageSize, search, sort)
       .then((resp) => {
-        setProductData(resp.data);
+        const data = resp.data;
+        setProductData(data.Data);
+        setTotalRecord(data.TotalRecord);
       })
       .catch((error) => {
         console.log('error', error);
       });
   };
 
-  console.log(`productData`, productData);
   const handleDeleteProduct = (id: any) => {
     deleteSanPham(id!.toString())
       .then((resp) => {
         const data = resp.data;
-        console.log(`data`, data);
         getProductList();
       })
       .catch((error) => {
@@ -97,10 +98,11 @@ function index() {
       <div>
         <Table columns={columns} dataSource={productData} pagination={false} />
         <Pagination
+          defaultPageSize={pageSize}
           defaultCurrent={currentPage}
           onChange={onPagingChange}
           current={currentPage}
-          total={totalPage * pageSize}
+          total={totalRecord}
         />
       </div>
     </Layout>
