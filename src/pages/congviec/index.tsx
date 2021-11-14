@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
-import { Table, Modal, Space, Pagination, DatePicker } from 'antd';
+import { Table, Modal, Space, Pagination, DatePicker, Input, Button, Select } from 'antd';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { getListCongViec } from '@core/services/API';
-
+const { Option } = Select;
 import ModalEditStaffInfo from './ModalEditStaffInfo';
 // import { getListStaff } from 'core/services/staff';
 
@@ -54,6 +54,12 @@ function index() {
   };
   const onPagingChange = (page: number) => {
     setCurrentPage(page);
+  };
+  const handleSelectChange = (value: any) => {
+    setSort(value);
+  };
+  const handleSearchChange = ({ target }: any) => {
+    setSearch(target.value);
   };
 
   const columns = [
@@ -119,7 +125,21 @@ function index() {
       </Layout> */}
 
       <Layout title={'Product'}>
-        <div>{/* <DatePicker onChange={onChange} /> */}</div>
+        <div>
+          <Input placeholder={'Search'} onChange={handleSearchChange} width="50%" />
+          <Button type="primary" onClick={getCongViecList}>
+            Search
+          </Button>
+          <Select defaultValue={'ID 0-9'} style={{ width: 120 }} onChange={handleSelectChange}>
+            <Option value={'name_asc'}>Tên A-Z</Option>
+            <Option value={'name_desc'}>Tên Z-A</Option>
+            <Option value={'id_asc'}>ID 0-9</Option>
+            <Option value={'id_desc'}>ID 9-0</Option>
+            {/* {sortSelect.map((item, index) => {
+            <Option value={item.name} key={index}>{item.title}</Option>
+          })} */}
+          </Select>
+        </div>
         <div>
           <Table columns={columns} dataSource={productData} pagination={false} />
           <Pagination
