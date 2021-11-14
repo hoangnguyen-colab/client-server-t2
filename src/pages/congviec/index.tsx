@@ -58,6 +58,10 @@ function index() {
 
   const columns = [
     {
+      title: 'Mã công việc',
+      dataIndex: 'maCongViec',
+    },
+    {
       title: 'Tên công việc',
       dataIndex: 'tenCongViec',
     },
@@ -81,10 +85,7 @@ function index() {
       title: 'Đơn giá',
       dataIndex: 'donGia',
     },
-    {
-      title: 'Mã công việc',
-      dataIndex: 'maCongViec',
-    },
+
     {
       title: 'Action',
       render: (record: any) => (
