@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
-import { Table, Modal, Space, Pagination, DatePicker, Input, Button, Select } from 'antd';
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import { Table, Modal, Space, Pagination, Input, Button, Select } from 'antd';
+// import axios from 'axios';
+// import Cookies from 'js-cookie';
 import { getListNhanCong } from '@core/services/API';
 const { Option } = Select;
 
