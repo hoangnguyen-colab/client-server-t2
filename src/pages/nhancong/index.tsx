@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
-import { Table, Modal, Space, Pagination, DatePicker, Input, Button, Select } from 'antd';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { getListCongViec } from '@core/services/API';
+import { Table, Modal, Space, Pagination, Input, Button, Select } from 'antd';
+// import axios from 'axios';
+// import Cookies from 'js-cookie';
+import { getListNhanCong } from '@core/services/API';
 const { Option } = Select;
-import ModalEditStaffInfo from './ModalEditStaffInfo';
+
+// import ModalEditStaffInfo from './ModalEditStaffInfo';
 // import { getListStaff } from 'core/services/staff';
 
 function index() {
@@ -22,11 +23,11 @@ function index() {
   const [sort, setSort] = useState<string>('id_asc');
 
   useEffect(() => {
-    getCongViecList();
+    getNhanCongList();
   }, [currentPage]);
 
-  const getCongViecList = async () => {
-    getListCongViec(currentPage - 1, pageSize, search, sort)
+  const getNhanCongList = async () => {
+    getListNhanCong(currentPage - 1, pageSize, search, sort)
       .then((resp) => {
         const data = resp.data;
         setProductData(data.Data);
@@ -55,41 +56,47 @@ function index() {
   const onPagingChange = (page: number) => {
     setCurrentPage(page);
   };
+
   const handleSelectChange = (value: any) => {
     setSort(value);
   };
+
   const handleSearchChange = ({ target }: any) => {
     setSearch(target.value);
   };
 
   const columns = [
     {
-      title: 'Mã công việc',
-      dataIndex: 'maCongViec',
+      title: 'Mã nhân công',
+      dataIndex: 'maNhanCong',
     },
     {
-      title: 'Tên công việc',
-      dataIndex: 'tenCongViec',
+      title: 'Họ và tên',
+      dataIndex: 'hoTen',
     },
     {
-      title: 'Định mức khoán',
-      dataIndex: 'dinhMucKhoan',
+      title: 'Ngày sinh',
+      dataIndex: 'ngaySinh',
     },
     {
-      title: 'Đơn vị khoán',
-      dataIndex: 'donViKhoan',
+      title: 'Giới tính',
+      dataIndex: 'gioiTinh',
     },
     {
-      title: 'Hệ số khoán',
-      dataIndex: 'heSoKhoan',
+      title: 'Phòng ban',
+      dataIndex: 'phongBan',
     },
     {
-      title: 'Định mức lao động',
-      dataIndex: 'dinhMucLaoDong',
+      title: 'Chức vụ',
+      dataIndex: 'chucVu',
     },
     {
-      title: 'Đơn giá',
-      dataIndex: 'donGia',
+      title: 'Quê quán',
+      dataIndex: 'queQuan',
+    },
+    {
+      title: 'Lương bảo hiểm',
+      dataIndex: 'luongBaoHiem',
     },
 
     {
@@ -127,7 +134,7 @@ function index() {
       <Layout title={'Product'}>
         <div>
           <Input placeholder={'Search'} onChange={handleSearchChange} width="50%" />
-          <Button type="primary" onClick={getCongViecList}>
+          <Button type="primary" onClick={getNhanCongList}>
             Search
           </Button>
           <Select defaultValue={'ID 0-9'} style={{ width: 120 }} onChange={handleSelectChange}>
