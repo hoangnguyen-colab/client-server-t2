@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
-import { Table, Space, Pagination, DatePicker, Input, Button, Select } from 'antd';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { parse } from 'path/posix';
-import Link from 'next/link';
+import { Table, Space, Pagination, DatePicker, Input, Button, Select, Modal } from 'antd';
 import { deleteSanPham, getListSanPham } from '@core/services/API';
-import router from 'next/router';
-
+import ModalEditProduct from './ModalEditProduct';
 const { Option } = Select;
 
 const sortSelect = [
@@ -42,10 +37,12 @@ function index() {
   const [date, setDate] = useState<string>('20190719');
   const [search, setSearch] = useState<string>('');
   const [sort, setSort] = useState<string>('id_asc');
+  const [productID, setProductID] = useState<string>('');
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   useEffect(() => {
     getProductList();
-  }, [currentPage, sort]);
+  }, [currentPage, sort, openModal]);
 
   const getProductList = async () => {
     getListSanPham(currentPage - 1, pageSize, search, sort)
@@ -62,12 +59,22 @@ function index() {
   const handleDeleteProduct = (id: any) => {
     deleteSanPham(id!.toString())
       .then((resp) => {
-        const data = resp.data;
         getProductList();
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const openDetailModal = (record: any) => {
+    setOpenModal(true);
+    console.log(`record`, record);
+    setProductID(record.maSanPham);
+  };
+
+  const handleSubmitModal = () => {
+    setOpenModal(false);
+    getProductList();
   };
 
   const columns = [
@@ -96,9 +103,8 @@ function index() {
       key: 'action',
       render: (text: any, record: any) => (
         <Space size="middle">
-          <Link href={`sanpham/${record.maSanPham}`}>
-            <a>Detail</a>
-          </Link>
+          {/* <Link href={`sanpham/${record.maSanPham}`}> */}
+          <a onClick={() => openDetailModal(record)}>Detail</a>
           <a onClick={() => handleDeleteProduct(record.maSanPham)}>Delete</a>
         </Space>
       ),
@@ -150,6 +156,19 @@ function index() {
           current={currentPage}
           total={totalRecord}
         />
+        <Modal
+          width={755}
+          bodyStyle={{ height: 'max-content' }}
+          title={'Detail of staff'}
+          visible={openModal}
+          onCancel={() => setOpenModal(false)}
+          onOk={() => setOpenModal(false)}
+          destroyOnClose
+          footer={null}
+          className="edit-profile-modal"
+        >
+          <ModalEditProduct maSanPham={productID} onCloseModal={() => setOpenModal(false)} />
+        </Modal>
       </div>
     </Layout>
   );

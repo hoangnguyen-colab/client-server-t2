@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { Checkbox, Row, Col, Form, Input, Button, Space } from 'antd';
+import { getSanPham, editSanPham } from '@core/services/API';
+
 // import { getStaffDetail, editStaffDetail } from 'core/services/staff';
 
 interface IStaffInfo {
-  staffID?: string;
+  maSanPham?: string;
+  onCloseModal?: () => void;
+  onSubmitAndReload?: () => void;
 }
 
 const formItemLayout = {
@@ -30,47 +34,45 @@ const tailFormItemLayout = {
     },
   },
 };
-const ModalEditStaffInfo: React.FC<IStaffInfo> = ({ staffID }) => {
+const ModalEditStaffInfo: React.FC<IStaffInfo> = ({ maSanPham, onCloseModal, onSubmitAndReload }) => {
   const [form] = Form.useForm();
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
   };
+
+  const router = useRouter();
   const LoadDetail = () => {
-    // getStaffDetail(staffID!.toString())
-    //   .then((resp) => {
-    //     const data = resp.data.Data.account_info;
-    //     if (data) {
-    //       console.log('resp', data);
-    //       fillForm(data);
-    //       console.log(`data.FirstName`, data.AccountId);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+    getSanPham(maSanPham!.toString())
+      .then((resp) => {
+        const data = resp.data;
+        if (data) {
+          fillForm(resp.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const fillForm = (data: any) => {
     form.setFieldsValue({
-      AccountId: data?.AccountId,
-      FirstName: data?.FirstName,
-      LastName: data?.LastName,
-      MidName: data.MidName,
-      Email: data.Email,
-      Country: data.Country,
-      Mobile: data.Mobile,
-      Intro: data.Intro,
+      maSanPham: data?.maSanPham,
+      tenSanPham: data?.tenSanPham,
+      ngaySanXuat: data?.ngaySanXuat,
+      ngayDangKy: data.ngayDangKy,
+      hanSuDung: data.hanSuDung,
+      soDangKy: data.soDangKy,
     });
   };
 
-  const handleEditProfile = (params: any) => {
-    // editStaffDetail(params)
-    //   .then((resp) => {
-    //     console.log(resp.data);
-    //   })
-    //   .catch((error) => {
-    //     console.log('error', error);
-    //   });
+  const handleEditProduct = (values: any) => {
+    editSanPham(values, maSanPham!.toString())
+      .then((resp) => {
+        console.log(resp.data);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
   };
 
   useEffect(() => {
@@ -79,55 +81,29 @@ const ModalEditStaffInfo: React.FC<IStaffInfo> = ({ staffID }) => {
 
   return (
     <>
-      <Form {...formItemLayout} form={form} name="register" onFinish={handleEditProfile} scrollToFirstError>
-        <Form.Item name="AccountId" label="AccountId">
-          <Input />
-          {/* <Input /> */}
-        </Form.Item>
-        <Form.Item name="MidName" label="MidName">
+      <Form {...formItemLayout} form={form} name="register" onFinish={handleEditProduct} scrollToFirstError>
+        <Form.Item name="maSanPham" label="Mã sản phẩm">
           <Input />
         </Form.Item>
-        <Form.Item name="LastName" label="LastName">
+        <Form.Item name="tenSanPham" label="Tên sản phẩm">
           <Input />
         </Form.Item>
-        <Form.Item name="Email" label="Email">
+        <Form.Item name="ngaySanXuat" label="Ngày sản xuất">
           <Input />
         </Form.Item>
-        <Form.Item name="Mobile" label="Mobile">
+        <Form.Item name="ngayDangKy" label="Ngày đăng ký">
           <Input />
         </Form.Item>
-        <Form.Item name="Country" label="Country">
+        <Form.Item name="soDangKy" label="Số đăng ký">
           <Input />
-        </Form.Item>
-        <Form.Item name="Intro" label="Intro">
-          <Input />
-        </Form.Item>
-        <Form.Item name="Right" label="Right">
-          <Row>
-            <Col xs={4}>
-              <Checkbox value="A">View</Checkbox>
-            </Col>
-            <Col xs={4}>
-              <Checkbox value="A">Add</Checkbox>
-            </Col>
-            <Col xs={4}>
-              <Checkbox value="A">Edit</Checkbox>
-            </Col>
-            <Col xs={4}>
-              <Checkbox value="A">Delete</Checkbox>
-            </Col>
-            <Col xs={4}>
-              <Checkbox value="A">All</Checkbox>
-            </Col>
-          </Row>
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Space>
             <Button type="primary" htmlType="submit">
               Update
             </Button>
-            <Button htmlType="button" onClick={() => null}>
-              Delete
+            <Button htmlType="button" onClick={onCloseModal}>
+              Cancel
             </Button>
           </Space>
         </Form.Item>
