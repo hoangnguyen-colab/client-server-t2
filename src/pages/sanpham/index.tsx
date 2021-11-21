@@ -2,21 +2,17 @@ import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
 import { Table, Space, Pagination, DatePicker } from 'antd';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { parse } from 'path/posix';
 import Link from 'next/link';
 import { deleteSanPham, getListSanPham } from '@core/services/API';
 import router from 'next/router';
 
 function index() {
   const [productData, setProductData] = useState<any>();
-  const [totalPage, setTotalPage] = useState<number>(2);
+  const [totalPage, setTotalPage] = useState<number>(3);
   const [totalRecord, setTotalRecord] = useState<number>(0);
   const [pageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [date, setDate] = useState<string>('20190719');
-
   useEffect(() => {
     getProductList();
   }, [currentPage]);

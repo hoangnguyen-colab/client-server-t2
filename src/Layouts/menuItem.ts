@@ -44,6 +44,20 @@ const items: MenuItemType[] = [
       },
     ],
   },
+  {
+    title: 'Thống kê',
+    icon: { name: 'star-outline' },
+    children: [
+      {
+        title: 'Ngày công',
+        link: { href: '/ngaycong' },
+      },
+      {
+        title: 'Lương',
+        link: { href: '/luong' },
+      },
+    ],
+  },
   // {
   //   title: 'Forms',
   //   icon: { name: 'edit-2-outline' },

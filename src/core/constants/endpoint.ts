@@ -8,6 +8,7 @@ export const CONTROLLERS = {
   SLK: 'slk',
   CONGVIEC: 'congviec',
   SANPHAM: 'sanpham',
+  LUONG: 'luong',
 };
 
 export const ENDPOINTS = {
@@ -17,4 +18,5 @@ export const ENDPOINTS = {
   SANPHAM: `${CONTEXT.API}/${CONTROLLERS.SANPHAM}`,
   SLK_ALL: `${CONTEXT.API}/${CONTROLLERS.SLK}/all`,
   SANPHAM_NDK: `${CONTEXT.API}/${CONTROLLERS.SANPHAM}/ndk`,
+  NGAYCONG: `${CONTEXT.API}/${CONTROLLERS.LUONG}/ngaycong`,
 };
