@@ -3,8 +3,29 @@ import { ENDPOINTS } from '../constants/endpoint';
 
 const { get, post } = apiClient;
 
+export const addSLK = (params: object) => post(`${ENDPOINTS.SLK}/add`, params);
 export const slk_all = (date: string) => get(ENDPOINTS.SLK_ALL + `?date=${date}`);
 export const slk_thang = (date: string) => get(`${ENDPOINTS.SLK}/thang?date=${date}`);
+export const getListSLKThang = (
+  date: string,
+  pageIndex?: number,
+  pageSize?: number,
+  search: string = '',
+  sort: string = 'id_asc',
+) =>
+  get(`${ENDPOINTS.SLK}/thang?date=${date}&pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
+export const getListSLK = (
+  thang: boolean,
+  date: string,
+  pageIndex?: number,
+  pageSize?: number,
+  search: string = '',
+  sort: string = 'id_asc',
+) =>
+  get(
+    `${ENDPOINTS.SLK}/thang_tuan?thang=${thang}&date=${date}&pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`,
+  );
+
 export const getListSanPham = (pageIndex?: number, pageSize?: number, search: string = '', sort: string = 'id_asc') =>
   get(`${ENDPOINTS.SANPHAM}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
 export const getSanPham = (id: string) => get(`${ENDPOINTS.SANPHAM}/${id}`);

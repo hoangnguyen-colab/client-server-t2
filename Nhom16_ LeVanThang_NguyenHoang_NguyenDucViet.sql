@@ -519,7 +519,7 @@ CREATE PROCEDURE NhatKySanLuongKhoan_TheoThang
 	@ThangLamViec DATETIME
 AS
 BEGIN 
-	SELECT NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, NhanCong.maNhanCong, NhanCong.maNhanCong ,NhanCong.hoTen FROM NKSLK, NKSLK_ChiTiet, NhanCong
+	SELECT NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, NhanCong.maNhanCong ,NhanCong.hoTen FROM NKSLK, NKSLK_ChiTiet, NhanCong
 	WHERE 
 		NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 		AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong 
@@ -530,6 +530,32 @@ END
 
 EXEC NhatKySanLuongKhoan_TheoThang @MaNhanCong = 7, @ThangLamViec = '2018-7-1'
 GO
+
+CREATE PROCEDURE NhatKySanLuongKhoan_TheoThang_Update
+	@MaNhanCong INT,
+	@ThangLamViec DATETIME
+AS
+BEGIN 
+	IF (@MaNhanCong = 0 OR @MaNhanCong IS NULL)
+		BEGIN
+			SELECT NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, NhanCong.maNhanCong, NhanCong.hoTen FROM NKSLK, NKSLK_ChiTiet, NhanCong
+			WHERE 
+				NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
+				AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
+				AND NKSLK.ngay BETWEEN @ThangLamViec-DAY(@ThangLamViec)+1 and EOMONTH(@ThangLamViec)
+			GROUP BY NhanCong.maNhanCong,NhanCong.hoTen, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+		END
+	ELSE
+		BEGIN
+			SELECT NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, NhanCong.maNhanCong, NhanCong.hoTen FROM NKSLK, NKSLK_ChiTiet, NhanCong
+			WHERE 
+				NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
+				AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong 
+				AND NhanCong.maNhanCong = @MaNhanCong
+				AND NKSLK.ngay BETWEEN @ThangLamViec-DAY(@ThangLamViec)+1 and EOMONTH(@ThangLamViec)
+			GROUP BY NhanCong.maNhanCong,NhanCong.hoTen, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+		END
+END
 
 -- Nhật ký sản lượng khoáng trong tuần của công nhân
 CREATE PROCEDURE NhatKySanLuongKhoan_Tuan 
@@ -549,7 +575,38 @@ BEGIN
 	GROUP BY NhanCong.maNhanCong,NhanCong.hoTen, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
 END
 
-EXEC NhatKySanLuongKhoan_Tuan @MaNhanCong=22, @Date = '2019-10-25'
+CREATE PROCEDURE NhatKySanLuongKhoan_Tuan_Update
+	@MaNhanCong INT, @Date DATETIME
+AS
+BEGIN
+	DECLARE @FirstDate DATETIME
+	DECLARE @LastDate DATETIME
+	IF (@MaNhanCong = 0 OR @MaNhanCong IS NULL)
+		BEGIN
+			SELECT @FirstDate = firstDate, @LastDate = lastDate FROM [GetWeekDay_Func](@Date)
+			SELECT NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, NhanCong.maNhanCong, NhanCong.hoTen
+			 FROM NKSLK, NKSLK_ChiTiet, NhanCong
+			WHERE 
+				NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
+				AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
+				AND NKSLK.ngay BETWEEN @FirstDate and @LastDate
+			GROUP BY NhanCong.maNhanCong,NhanCong.hoTen, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+		END
+	ELSE 
+		BEGIN
+			SELECT @FirstDate = firstDate, @LastDate = lastDate FROM [GetWeekDay_Func](@Date)
+			SELECT NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, NhanCong.maNhanCong, NhanCong.hoTen
+			 FROM NKSLK, NKSLK_ChiTiet, NhanCong
+			WHERE 
+				NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
+				AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
+				AND NhanCong.maNhanCong = @MaNhanCong
+				AND NKSLK.ngay BETWEEN @FirstDate and @LastDate
+			GROUP BY NhanCong.maNhanCong,NhanCong.hoTen, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+		END
+END
+
+EXEC NhatKySanLuongKhoan_Tuan_Update @MaNhanCong=0, @Date = '2019-10-25'
 GO
 
 --2. Hiển thị thông tin công việc có nhiều NKSLK nhất
@@ -584,6 +641,8 @@ ORDER BY phongBan DESC;
 SELECT * FROM NhanCong
 ORDER BY chucVu DESC;
 
+select * from NhanCong
+
 -- 8. Hiển thị danh mục công nhân chuẩn bị về hưu (còn làm việc thêm một năm, 54 đối với nam và 49 đối với nữ). 
 WITH NKSLK_NHANCONG_TUOI(maNhanCong, hoTen, gioiTinh, Tuoi) AS (
 	SELECT maNhanCong, hoTen, gioiTinh, 
@@ -613,7 +672,7 @@ CREATE PROCEDURE NKSLK_NhaMay
 	@ThangLamViec DATETIME
 AS
 BEGIN
-	SELECT NhanCong.maNhanCong, NhanCong.hoTen, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
 	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
 	WHERE 
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
@@ -621,10 +680,10 @@ BEGIN
 	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
 	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
 	AND NKSLK.ngay BETWEEN @ThangLamViec-DAY(@ThangLamViec)+1 and EOMONTH(@ThangLamViec)
-	GROUP BY NhanCong.maNhanCong, NhanCong.hoTen, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
 END
 
-EXEC NKSLK_NhaMay @ThangLamViec = '2019-10-1'
+EXEC NKSLK_NhaMay @ThangLamViec = '2019-07-01'
 
 CREATE PROCEDURE NKSLK_NhaMay_Tuan
 	@Date DATETIME
@@ -633,7 +692,7 @@ BEGIN
 	DECLARE @FirstDate DATETIME
 	DECLARE @LastDate DATETIME
 	SELECT @FirstDate = firstDate, @LastDate = lastDate FROM [GetWeekDay_Func](@Date)
-	SELECT NhanCong.maNhanCong, NhanCong.hoTen, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
 	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
 	WHERE 
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
@@ -641,7 +700,7 @@ BEGIN
 	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
 	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
 	AND NKSLK.ngay BETWEEN @FirstDate and @LastDate
-	GROUP BY NhanCong.maNhanCong, NhanCong.hoTen, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
 END
 
 EXEC NKSLK_NhaMay_Tuan @Date ='2019-10-25'
