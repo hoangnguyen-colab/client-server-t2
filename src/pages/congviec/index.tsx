@@ -3,10 +3,9 @@ import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
 import { Table, Modal, Space, Pagination, DatePicker, Input, Button, Select } from 'antd';
 import axios from 'axios';
-import Cookies from 'js-cookie';
-import { getListCongViec } from '@core/services/API';
+import { deleteCongViec, getListCongViec } from '@core/services/API';
 const { Option } = Select;
-import ModalEditStaffInfo from './ModalEditStaffInfo';
+import ModalEditStaffInfo from './ModalEditWorkInfo';
 // import { getListStaff } from 'core/services/staff';
 
 function index() {
@@ -20,6 +19,7 @@ function index() {
   const [staffID, setStaffID] = useState<string>('');
   const [search, setSearch] = useState<string>('');
   const [sort, setSort] = useState<string>('id_asc');
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   useEffect(() => {
     getCongViecList();
@@ -48,9 +48,10 @@ function index() {
     //   });
   };
 
-  const openDetailModal = (id: string) => {
-    setShowEditProfileModal(true);
-    setStaffID(id);
+  const openDetailModal = (record: any) => {
+    setOpenModal(true);
+    setStaffID(record.maCongViec);
+    console.log(`record`, record);
   };
   const onPagingChange = (page: number) => {
     setCurrentPage(page);
@@ -60,6 +61,15 @@ function index() {
   };
   const handleSearchChange = ({ target }: any) => {
     setSearch(target.value);
+  };
+  const handleDeleteStaff = (id: any) => {
+    deleteCongViec(id!.toString())
+      .then((resp) => {
+        getListCongViec();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const columns = [
@@ -96,7 +106,9 @@ function index() {
       title: 'Action',
       render: (record: any) => (
         <Space size="middle">
-          <a onClick={() => openDetailModal(record.AccountId)}>Detail </a>
+          <a onClick={() => openDetailModal(record)}>Detail </a>
+          <a onClick={() => handleDeleteStaff(record.maSanPham)}>Delete</a>
+
           {/* <a>Delete</a> */}
         </Space>
       ),
@@ -149,6 +161,19 @@ function index() {
             current={currentPage}
             total={totalRecord}
           />
+          <Modal
+            width={755}
+            bodyStyle={{ height: 'max-content' }}
+            title={'Detail of staff'}
+            visible={openModal}
+            onCancel={() => setOpenModal(false)}
+            onOk={() => setOpenModal(false)}
+            destroyOnClose
+            footer={null}
+            className="edit-profile-modal"
+          >
+            <ModalEditStaffInfo maCongViec={staffID} onCloseModal={() => setOpenModal(false)} />
+          </Modal>
         </div>
       </Layout>
     </>

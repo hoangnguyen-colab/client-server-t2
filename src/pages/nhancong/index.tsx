@@ -4,9 +4,9 @@ import withAuth from '@hocs/withAuth';
 import { Table, Modal, Space, Pagination, Input, Button, Select } from 'antd';
 // import axios from 'axios';
 // import Cookies from 'js-cookie';
-import { getListNhanCong } from '@core/services/API';
+import { getListNhanCong, deleteNhanCong } from '@core/services/API';
 const { Option } = Select;
-
+import ModalEditStaffInfo from './ModalEditStaff';
 // import ModalEditStaffInfo from './ModalEditStaffInfo';
 // import { getListStaff } from 'core/services/staff';
 
@@ -17,11 +17,10 @@ function index() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [role, setRole] = useState<any>();
   const [listStaff, setListStaff] = useState<any>();
-  const [showEditProfileModal, setShowEditProfileModal] = React.useState<boolean>(false);
   const [staffID, setStaffID] = useState<string>('');
   const [search, setSearch] = useState<string>('');
   const [sort, setSort] = useState<string>('id_asc');
-
+  const [openModal, setOpenModal] = useState<boolean>(false);
   useEffect(() => {
     getNhanCongList();
   }, [currentPage]);
@@ -49,9 +48,10 @@ function index() {
     //   });
   };
 
-  const openDetailModal = (id: string) => {
-    setShowEditProfileModal(true);
-    setStaffID(id);
+  const openDetailModal = (record: any) => {
+    setOpenModal(true);
+    setStaffID(record.maNhanCong);
+    console.log(`record`, record);
   };
   const onPagingChange = (page: number) => {
     setCurrentPage(page);
@@ -63,6 +63,15 @@ function index() {
 
   const handleSearchChange = ({ target }: any) => {
     setSearch(target.value);
+  };
+  const handleDeleteStaff = (id: any) => {
+    deleteNhanCong(id!.toString())
+      .then((resp) => {
+        getListNhanCong();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const columns = [
@@ -103,7 +112,9 @@ function index() {
       title: 'Action',
       render: (record: any) => (
         <Space size="middle">
-          <a onClick={() => openDetailModal(record.AccountId)}>Detail </a>
+          <a onClick={() => openDetailModal(record)}>Detail </a>
+          <a onClick={() => handleDeleteStaff(record.maSanPham)}>Delete</a>
+
           {/* <a>Delete</a> */}
         </Space>
       ),
@@ -156,6 +167,19 @@ function index() {
             current={currentPage}
             total={totalRecord}
           />
+          <Modal
+            width={755}
+            bodyStyle={{ height: 'max-content' }}
+            title={'Detail of staff'}
+            visible={openModal}
+            onCancel={() => setOpenModal(false)}
+            onOk={() => setOpenModal(false)}
+            destroyOnClose
+            footer={null}
+            className="edit-profile-modal"
+          >
+            <ModalEditStaffInfo maNhanCong={staffID} onCloseModal={() => setOpenModal(false)} />
+          </Modal>
         </div>
       </Layout>
     </>

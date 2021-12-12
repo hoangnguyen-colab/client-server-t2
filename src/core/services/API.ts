@@ -35,8 +35,18 @@ export const addSanPham = (params: object) => post(`${ENDPOINTS.SANPHAM}/add`, p
 export const deleteSanPham = (id: string) => apiClient.delete(`${ENDPOINTS.SANPHAM}/delete/${id}`);
 export const getNgayCong = (date: string) => get(`${ENDPOINTS.NGAYCONG}?date=${date}`);
 
+//api cong viec
 export const getListCongViec = (pageIndex?: number, pageSize?: number, search: string = '', sort: string = 'id_asc') =>
   get(`${ENDPOINTS.CONGVIEC}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
+export const getCongViec = (id: string) => get(`${ENDPOINTS.CONGVIEC}/${id}`);
+export const editCongViec = (params: object, id: string) => post(`${ENDPOINTS.CONGVIEC}/edit/${id}`, params);
+export const deleteCongViec = (id: string) => apiClient.delete(`${ENDPOINTS.CONGVIEC}/delete/${id}`);
+export const addCongViec = (params: object) => post(`${ENDPOINTS.CONGVIEC}/add`, params);
 
+//api nhan cong
 export const getListNhanCong = (pageIndex?: number, pageSize?: number, search: string = '', sort: string = 'id_asc') =>
   get(`${ENDPOINTS.NHANCONG}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
+export const getNhanCong = (id: string) => get(`${ENDPOINTS.NHANCONG}/${id}`);
+export const editNhanCong = (params: object, id: string) => post(`${ENDPOINTS.NHANCONG}/edit/${id}`, params);
+export const addNhanCong = (params: object) => post(`${ENDPOINTS.NHANCONG}/add`, params);
+export const deleteNhanCong = (id: string) => apiClient.delete(`${ENDPOINTS.NHANCONG}/delete/${id}`);
