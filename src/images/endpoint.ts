@@ -1,0 +1,24 @@
+export const CONTEXT = {
+  API: 'api',
+  STATIC: 'static',
+  ADMIN: 'admin',
+};
+
+export const CONTROLLERS = {
+  SLK: 'slk',
+  CONGVIEC: 'congviec',
+  SANPHAM: 'sanpham',
+  LUONG: 'luong',
+  NHANCONG: 'nhancong',
+};
+
+export const ENDPOINTS = {
+  PUBLIC: `${CONTEXT.API}/${CONTROLLERS.SLK}`,
+  SLK: `${CONTEXT.API}/${CONTROLLERS.SLK}`,
+  CONGVIEC: `${CONTEXT.API}/${CONTROLLERS.CONGVIEC}`,
+  SANPHAM: `${CONTEXT.API}/${CONTROLLERS.SANPHAM}`,
+  NHANCONG: `${CONTEXT.API}/${CONTROLLERS.NHANCONG}`,
+  SLK_ALL: `${CONTEXT.API}/${CONTROLLERS.SLK}/all`,
+  SANPHAM_NDK: `${CONTEXT.API}/${CONTROLLERS.SANPHAM}/ndk`,
+  NGAYCONG: `${CONTEXT.API}/${CONTROLLERS.LUONG}/ngaycong`,
+};
