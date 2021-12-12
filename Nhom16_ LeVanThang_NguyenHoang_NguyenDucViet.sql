@@ -48,24 +48,14 @@ CREATE TABLE NKSLK_ChiTiet
 (
 	maChiTiet INT, --mã Chi tiết
 	maNKSLK INT, --mã Nhật ký Sản lượng khoán
+	maCongViec INT, --mã Công việc
+	sanLuongThucTe FLOAT, --sản lượng Thực tế
+	soLoSanPham VARCHAR(20), --số lô Sản phẩm
+	maSanPham INT, --mã Sản phẩm/áp dụng cho Sản phẩm
 	maNhanCong INT, --mã Nhân công
 	gioBatDau TIME, --giờ Bắt đầu
 	gioKetThuc TIME, --giờ Kết thúc
 )
-GO
-
---Bảng Danh mục khoán_Chi tiết:
---các công việc đã hoàn thành trong Nhật ký Sản lượng
-CREATE TABLE DanhMucKhoan_ChiTiet
-(
-	maChiTiet INT, --mã Chi tiết
-	maNKSLK INT, --mã Nhật ký Sản lượng khoán
-	maCongViec INT, --mã Công việc
-	sanLuongThucTe FLOAT, --sản lượng Thực tế
-	soLoSanPham VARCHAR(20), --số lô Sản phẩm
-	maSanPham INT --mã Sản phẩm/áp dụng cho Sản phẩm
-)
-
 --Công việc
 CREATE TABLE CongViec
 (
@@ -77,7 +67,6 @@ CREATE TABLE CongViec
 	dinhMucLaoDong FLOAT, --Định mức lao động
 	donGia FLOAT --Đơn giá = 126 360*Hệ số khoán*Định mức lao động/Định mức khoán
 )
-
 --bảng nhân công
 CREATE TABLE NhanCong
 (
@@ -90,7 +79,6 @@ CREATE TABLE NhanCong
 	queQuan NVARCHAR(50), --quê quán
 	luongBaoHiem FLOAT --lương bảo hiểm
 )
-
 --bảng sản phẩm
 CREATE TABLE SanPham
 (
@@ -114,13 +102,6 @@ GO
 ALTER TABLE NKSLK_ChiTiet
 DROP COLUMN maChiTiet
 ALTER TABLE NKSLK_ChiTiet
-ADD maChiTiet INT IDENTITY (1,1)
-PRIMARY KEY(maChiTiet)
-GO
-
-ALTER TABLE DanhMucKhoan_ChiTiet
-DROP COLUMN maChiTiet
-ALTER TABLE DanhMucKhoan_ChiTiet
 ADD maChiTiet INT IDENTITY (1,1)
 PRIMARY KEY(maChiTiet)
 GO
@@ -150,12 +131,7 @@ GO
 ALTER TABLE NKSLK_ChiTiet
 ADD
 	CONSTRAINT fk_maNKSLK FOREIGN KEY (maNKSLK) REFERENCES NKSLK(maNKSLK),
-	CONSTRAINT fk_maNhanCong FOREIGN KEY (maNhanCong) REFERENCES NhanCong(maNhanCong)
-GO
-
-ALTER TABLE DanhMucKhoan_ChiTiet
-ADD
-	CONSTRAINT fk_maNKSLK_2 FOREIGN KEY (maNKSLK) REFERENCES NKSLK(maNKSLK),
+	CONSTRAINT fk_maNhanCong FOREIGN KEY (maNhanCong) REFERENCES NhanCong(maNhanCong),
 	CONSTRAINT fk_maCongViec FOREIGN KEY (maCongViec) REFERENCES CongViec(maCongViec),
 	CONSTRAINT fk_maSanPham FOREIGN KEY (maSanPham) REFERENCES SanPham(maSanPham)
 GO
@@ -163,10 +139,8 @@ GO
 --đặt chỉ mục
 CREATE INDEX ind_maNKSLK ON NKSLK_ChiTiet(maNKSLK);
 CREATE INDEX ind_maNhanCong ON NKSLK_ChiTiet(maNhanCong);
-
-CREATE INDEX ind_maNKSLK_2 ON DanhMucKhoan_ChiTiet(maNKSLK);
-CREATE INDEX ind_maCongViec ON DanhMucKhoan_ChiTiet(maCongViec);
-CREATE INDEX ind_maSanPham ON DanhMucKhoan_ChiTiet(maSanPham);
+CREATE INDEX ind_maCongViec ON NKSLK_ChiTiet(maCongViec);
+CREATE INDEX ind_maSanPham ON NKSLK_ChiTiet(maSanPham);
 
 CREATE INDEX ind_phongBan ON NhanCong(phongBan);
 CREATE INDEX ind_chucVu ON NhanCong(chucVu);
@@ -213,193 +187,6 @@ INSERT INTO CongViec(tenCongViec, dinhMucKhoan, donViKhoan, heSoKhoan, dinhMucLa
 (N'Khảo sát thị trường', 4.54, N'ký', 0.5, 3.62, 0),
 (N'Sale', 2.59, N'cân', 4.7, 4.6, 0)
 
-INSERT INTO NKSLK(ngay) VALUES ('2018-09-25'),
-('2018-07-01'),
-('2019-04-04'),
-('2019-01-24'),
-('2019-10-19'),
-('2019-11-08'),
-('2018-03-17'),
-('2019-03-13'),
-('2019-03-07'),
-('2018-12-14'),
-('2018-03-09'),
-('2018-03-08'),
-('2018-11-03'),
-('2018-06-28'),
-('2018-06-05'),
-('2018-07-25'),
-('2019-09-11'),
-('2019-11-29'),
-('2019-06-23'),
-('2018-06-19'),
-('2019-02-10'),
-('2019-07-27'),
-('2018-01-30'),
-('2019-12-31'),
-('2019-10-21'),
-('2018-04-04'),
-('2018-05-07'),
-('2019-01-06'),
-('2018-11-08'),
-('2018-05-03');
-
-INSERT INTO NKSLK_ChiTiet(maNKSLK, maNhanCong, gioBatDau, gioKetThuc) VALUES
-(1, 5, '14:00:00', '22:00:00'),
-(2, 6, '6:00:00', '14:00:00'),
-(3, 19, '6:00:00', '14:00:00'),
-(4, 11, '22:00:00', '6:00:00'),
-(5, 23, '6:00:00', '14:00:00'),
-(6, 24, '6:00:00', '14:00:00'),
-(7, 1, '22:00:00', '6:00:00'),
-(8, 7, '14:00:00', '22:00:00'),
-(9, 4, '22:00:00', '6:00:00'),
-(10, 5, '22:00:00', '6:00:00'),
-(11, 3, '22:00:00', '6:00:00'),
-(11, 2, '22:00:00', '6:00:00'),
-(11, 22, '14:00:00', '22:00:00'),
-(11, 11, '6:00:00', '14:00:00'),
-(11, 25, '22:00:00', '6:00:00'),
-(12, 11, '22:00:00', '6:00:00'),
-(12, 22, '6:00:00', '14:00:00'),
-(12, 11, '22:00:00', '6:00:00'),
-(12, 23, '22:00:00', '6:00:00'),
-(13, 7, '14:00:00', '22:00:00'),
-(13, 11, '14:00:00', '22:00:00'),
-(13, 7, '22:00:00', '6:00:00'),
-(13, 10, '6:00:00', '14:00:00'),
-(13, 23, '22:00:00', '6:00:00'),
-(14, 8, '22:00:00', '6:00:00'),
-(14, 5, '22:00:00', '6:00:00'),
-(14, 7, '22:00:00', '6:00:00'),
-(14, 17, '22:00:00', '6:00:00'),
-(14, 12, '14:00:00', '22:00:00'),
-(14, 1, '14:00:00', '22:00:00'),
-(14, 17, '22:00:00', '6:00:00'),
-(15, 14, '14:00:00', '22:00:00'),
-(15, 6, '22:00:00', '6:00:00'),
-(15, 7, '6:00:00', '14:00:00'),
-(15, 24, '22:00:00', '6:00:00'),
-(15, 8, '14:00:00', '22:00:00'),
-(15, 19, '14:00:00', '22:00:00'),
-(16, 4, '14:00:00', '22:00:00'),
-(16, 21, '14:00:00', '22:00:00'),
-(16, 7, '6:00:00', '14:00:00'),
-(16, 4, '6:00:00', '14:00:00'),
-(17, 17, '14:00:00', '22:00:00'),
-(17, 11, '14:00:00', '22:00:00'),
-(17, 17, '22:00:00', '6:00:00'),
-(17, 9, '6:00:00', '14:00:00'),
-(17, 7, '14:00:00', '22:00:00'),
-(17, 13, '6:00:00', '14:00:00'),
-(17, 2, '6:00:00', '14:00:00'),
-(17, 15, '22:00:00', '6:00:00'),
-(17, 1, '6:00:00', '14:00:00'),
-(17, 22, '22:00:00', '6:00:00'),
-(18, 23, '22:00:00', '6:00:00'),
-(18, 22, '6:00:00', '14:00:00'),
-(18, 1, '6:00:00', '14:00:00'),
-(18, 6, '14:00:00', '22:00:00'),
-(18, 10, '22:00:00', '6:00:00'),
-(18, 17, '14:00:00', '22:00:00'),
-(18, 13, '22:00:00', '6:00:00'),
-(18, 19, '14:00:00', '22:00:00'),
-(18, 11, '6:00:00', '14:00:00'),
-(18, 6, '14:00:00', '22:00:00'),
-(19, 6, '22:00:00', '6:00:00'),
-(19, 2, '14:00:00', '22:00:00'),
-(19, 23, '22:00:00', '6:00:00'),
-(19, 19, '6:00:00', '14:00:00'),
-(19, 25, '22:00:00', '6:00:00'),
-(19, 13, '6:00:00', '14:00:00'),
-(19, 25, '14:00:00', '22:00:00'),
-(19, 14, '22:00:00', '6:00:00'),
-(20, 13, '22:00:00', '6:00:00'),
-(20, 4, '6:00:00', '14:00:00'),
-(20, 6, '22:00:00', '6:00:00'),
-(20, 21, '6:00:00', '14:00:00'),
-(20, 14, '22:00:00', '6:00:00'),
-(21, 15, '14:00:00', '22:00:00'),
-(21, 20, '7:00:00', '15:00:00'),
-(21, 7, '7:00:00', '15:00:00'),
-(21, 24, '7:00:00', '15:00:00'),
-(21, 22, '7:00:00', '15:00:00'),
-(21, 7, '7:00:00', '15:00:00'),
-(22, 2, '7:00:00', '15:00:00'),
-(22, 21, '22:00:00', '6:00:00'),
-(22, 10, '6:00:00', '14:00:00'),
-(22, 12, '6:00:00', '14:00:00'),
-(22, 2, '22:00:00', '6:00:00'),
-(22, 22, '15:00:00', '23:00:00'),
-(22, 16, '22:00:00', '6:00:00'),
-(23, 4, '7:00:00', '15:00:00'),
-(23, 16, '6:00:00', '14:00:00'),
-(23, 14, '14:00:00', '22:00:00'),
-(23, 5, '14:00:00', '22:00:00'),
-(23, 20, '22:00:00', '6:00:00'),
-(23, 17, '6:00:00', '14:00:00'),
-(23, 19, '23:00:00', '7:00:00'),
-(23, 9, '23:00:00', '7:00:00'),
-(23, 17, '22:00:00', '6:00:00'),
-(23, 21, '7:00:00', '15:00:00'),
-(24, 1, '22:00:00', '6:00:00'),
-(24, 15, '6:00:00', '14:00:00'),
-(24, 24, '14:00:00', '22:00:00'),
-(24, 4, '7:00:00', '15:00:00'),
-(24, 16, '23:00:00', '7:00:00'),
-(24, 4, '7:00:00', '15:00:00'),
-(24, 16, '23:00:00', '7:00:00'),
-(24, 7, '7:00:00', '15:00:00'),
-(24, 10, '23:00:00', '7:00:00'),
-(24, 5, '23:00:00', '7:00:00'),
-(25, 10, '15:00:00', '23:00:00'),
-(25, 16, '23:00:00', '7:00:00'),
-(25, 22, '23:00:00', '7:00:00'),
-(25, 24, '7:00:00', '15:00:00'),
-(25, 12, '23:00:00', '7:00:00'),
-(25, 2, '23:00:00', '7:00:00'),
-(25, 20, '7:00:00', '15:00:00'),
-(25, 2, '15:00:00', '23:00:00'),
-(26, 22, '22:00:00', '6:00:00'),
-(26, 25, '22:00:00', '6:00:00'),
-(26, 18, '14:00:00', '22:00:00'),
-(26, 17, '15:00:00', '23:00:00'),
-(26, 11, '23:00:00', '7:00:00'),
-(26, 17, '23:00:00', '7:00:00'),
-(26, 7, '23:00:00', '7:00:00'),
-(26, 5, '22:00:00', '6:00:00'),
-(26, 24, '7:00:00', '15:00:00'),
-(26, 23, '23:00:00', '7:00:00'),
-(27, 22, '7:00:00', '15:00:00'),
-(27, 9, '7:00:00', '15:00:00'),
-(27, 10, '14:00:00', '22:00:00'),
-(27, 24, '14:00:00', '22:00:00'),
-(28, 11, '22:00:00', '6:00:00'),
-(28, 10, '15:00:00', '23:00:00'),
-(28, 19, '23:00:00', '7:00:00'),
-(28, 6, '14:00:00', '22:00:00'),
-(28, 25, '15:00:00', '23:00:00'),
-(28, 8, '23:00:00', '7:00:00'),
-(28, 22, '23:00:00', '7:00:00'),
-(28, 2, '14:00:00', '22:00:00'),
-(28, 11, '23:00:00', '7:00:00'),
-(29, 6, '15:00:00', '23:00:00'),
-(29, 6, '15:00:00', '23:00:00'),
-(29, 24, '6:00:00', '14:00:00'),
-(29, 18, '6:00:00', '14:00:00'),
-(29, 20, '23:00:00', '7:00:00'),
-(29, 8, '14:00:00', '22:00:00'),
-(29, 4, '7:00:00', '15:00:00'),
-(29, 9, '22:00:00', '6:00:00'),
-(29, 2, '23:00:00', '7:00:00'),
-(29, 21, '15:00:00', '23:00:00'),
-(30, 5, '23:00:00', '7:00:00'),
-(30, 5, '7:00:00', '15:00:00'),
-(30, 12, '14:00:00', '22:00:00'),
-(30, 4, '6:00:00', '14:00:00'),
-(30, 21, '23:00:00', '7:00:00'),
-(30, 2, '14:00:00', '22:00:00');
-
 INSERT INTO SanPham(tenSanPham, soDangKy, hanSuDung, ngayDangKy, ngaySanXuat) VALUES ('Máy hóa', '2154', '2026-11-24', '2020-1-11', '2020-1-1')
 INSERT INTO SanPham(tenSanPham, soDangKy, hanSuDung, ngayDangKy, ngaySanXuat) VALUES ('Bàn là khô', '214', '2026-11-24', '2021-7-11', '2021-7-1')
 INSERT INTO SanPham(tenSanPham, soDangKy, hanSuDung, ngayDangKy, ngaySanXuat) VALUES ('Áo thun', '154', '2022-1-24', '2019-12-8', '2019-12-1')
@@ -417,72 +204,93 @@ INSERT INTO SanPham(tenSanPham, soDangKy, hanSuDung, ngayDangKy, ngaySanXuat) VA
 INSERT INTO SanPham(tenSanPham, soDangKy, hanSuDung, ngayDangKy, ngaySanXuat) VALUES ('Chăn', '33658', '2022-1-24', '2020-11-11', '2020-11-1')
 INSERT INTO SanPham(tenSanPham, soDangKy, hanSuDung, ngayDangKy, ngaySanXuat) VALUES ('Cuốc', '6554', '2026-6-24', '2021-10-17', '2021-10-1')
 
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (1, 5, 15, 11, 8)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (1, 6, 35, 5, 14)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (2, 1, 4, 1, 12)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (2, 1, 5, 12, 9)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (2, 2, 19, 10, 8)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (2, 2, 3, 13, 16)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (3, 4, 20, 3, 9)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (2, 5, 8, 10, 4)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (3, 5, 14, 17, 3)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (3, 2, 23, 9, 10)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (3, 1, 23, 1, 12)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (3, 2, 5, 3, 1)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (4, 3, 11, 15, 4)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (4, 3, 16, 2, 3)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (5, 9, 20, 6, 5)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (5, 5, 24, 5, 7)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (5, 2, 12, 16, 5)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (5, 7, 16, 18, 6)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (6, 2, 15, 4, 4)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (6, 8, 28, 19, 7)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (7, 8, 24, 17, 8)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (7, 6, 32, 14, 9)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (7, 4, 1, 7, 6)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (9, 6, 21, 7, 13)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (10, 6, 19, 6, 11)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 3, 15, 8, 16)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 2, 7, 1, 7)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 2, 17, 6, 1)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 2, 14, 17, 3)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 10, 17, 19, 5)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 7, 7, 11, 11)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 2, 5, 15, 9)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (11, 3, 18, 4, 9)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 10, 24, 3, 4)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 7, 2, 9, 18)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 10, 18, 1, 3)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 2, 23, 2, 5)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 1, 15, 2, 8)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 5, 14, 17, 7)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 9, 23, 6, 7)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 7, 24, 23, 16)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (13, 6, 17, 5, 8)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 2, 26, 14, 11)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 1, 29, 18, 10)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (12, 5, 24, 2, 11)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (13, 2, 1, 4, 13)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (17, 7, 4, 12, 17)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (14, 4, 1, 8, 14)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (16, 6, 23, 9, 15)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (14, 8, 34, 12, 17)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (14, 9, 27, 20, 12)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (15, 8, 4, 8, 5)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (13, 8, 4, 10, 5)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (14, 8, 3, 11, 4)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (15, 6, 9, 12, 3)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (15, 1, 15, 7, 3)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (22, 2, 22, 7, 8)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (25, 10, 11, 9, 9)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (26, 1, 10, 2, 10)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (17, 4, 14, 5, 14)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (18, 9, 22, 7, 10)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (19, 8, 20, 8, 10)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (21, 6, 9, 12, 17)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (21, 5, 3, 14, 15)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (29, 9, 7, 15, 1)
-INSERT INTO DanhMucKhoan_ChiTiet(maNKSLK, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) VALUES (25, 1, 4, 16, 1)
+INSERT INTO NKSLK(ngay) VALUES ('2020-09-25'),
+('2020-07-01'),
+('2019-04-04'),
+('2019-01-24'),
+('2019-10-19'),
+('2019-11-08'),
+('2020-03-17'),
+('2019-03-13'),
+('2019-03-07'),
+('2020-12-14'),
+('2020-03-09'),
+('2020-03-08'),
+('2020-11-03'),
+('2020-06-28'),
+('2020-06-05'),
+('2020-07-25'),
+('2019-09-11'),
+('2019-11-29'),
+('2019-06-23'),
+('2020-06-19'),
+('2019-02-10'),
+('2019-07-27'),
+('2020-01-30'),
+('2019-12-31'),
+('2019-10-21'),
+('2020-04-04'),
+('2020-05-07'),
+('2019-01-06'),
+('2020-11-08'),
+('2020-05-03');
+
+INSERT INTO NKSLK_ChiTiet(maNKSLK, maNhanCong, gioBatDau, gioKetThuc, maCongViec, sanLuongThucTe, soLoSanPham, maSanPham) 
+VALUES (1, 5, '14:00:00', '22:00:00', 5, 15, 11, 8),
+(1, 6, '6:00:00', '14:00:00', 6, 35, 5, 14),
+(2, 19, '6:00:00', '14:00:00', 1, 4, 1, 12),
+(2, 11, '22:00:00', '6:00:00', 1, 5, 12, 9),
+(2, 23, '6:00:00', '14:00:00', 2, 19, 10, 8),
+(2, 24, '6:00:00', '14:00:00', 2, 3, 13, 16),
+(3, 1, '22:00:00', '6:00:00', 4, 20, 3, 9),
+(2, 7, '14:00:00', '22:00:00', 5, 8, 10, 4),
+(3, 4, '22:00:00', '6:00:00', 5, 14, 17, 3),
+(3, 5, '22:00:00', '6:00:00', 2, 23, 9, 10),
+(3, 3, '22:00:00', '6:00:00', 1, 23, 1, 12),
+(3, 2, '22:00:00', '6:00:00', 2, 5, 3, 1),
+(4, 22, '14:00:00', '22:00:00', 3, 11, 15, 4),
+(4, 11, '6:00:00', '14:00:00', 3, 16, 2, 3),
+(5, 25, '22:00:00', '6:00:00', 9, 20, 6, 5),
+(5, 11, '22:00:00', '6:00:00', 5, 24, 5, 7),
+(5, 22, '6:00:00', '14:00:00', 2, 12, 16, 5),
+(5, 11, '22:00:00', '6:00:00', 7, 16, 18, 6),
+(6, 23, '22:00:00', '6:00:00', 2, 15, 4, 4),
+(6, 7, '14:00:00', '22:00:00', 8, 28, 19, 7),
+(7, 11, '14:00:00', '22:00:00', 8, 24, 17, 8),
+(7, 7, '22:00:00', '6:00:00', 6, 32, 14, 9),
+(7, 10, '6:00:00', '14:00:00', 4, 1, 7, 6),
+(9, 23, '22:00:00', '6:00:00', 6, 21, 7, 13),
+(10, 7, '14:00:00', '22:00:00', 6, 19, 6, 11),
+(11, 11, '14:00:00', '22:00:00', 3, 15, 8, 16),
+(11, 7, '22:00:00', '6:00:00', 2, 7, 1, 7),
+(11, 10, '6:00:00', '14:00:00', 2, 17, 6, 1),
+(11, 23, '22:00:00', '6:00:00', 2, 14, 17, 3),
+(12, 8, '22:00:00', '6:00:00', 10, 24, 3, 4),
+(12, 5, '22:00:00', '6:00:00', 7, 2, 9, 11),
+(12, 7, '22:00:00', '6:00:00', 2, 23, 2, 5),
+(12, 17, '22:00:00', '6:00:00', 9, 23, 6, 7),
+(12, 12, '14:00:00', '22:00:00', 7, 24, 23, 16),
+(13, 1, '14:00:00', '22:00:00', 6, 17, 5, 8),
+(12, 17, '22:00:00', '6:00:00', 2, 26, 14, 11),
+(12, 14, '14:00:00', '22:00:00', 1, 29, 18, 10),
+(12, 6, '22:00:00', '6:00:00', 5, 24, 2, 11),
+(13, 7, '6:00:00', '14:00:00', 2, 1, 4, 13),
+(17, 24, '22:00:00', '6:00:00', 7, 4, 12, 12),
+(14, 8, '14:00:00', '22:00:00', 4, 1, 8, 14),
+(16, 19, '14:00:00', '22:00:00', 6, 23, 9, 15),
+(14, 4, '14:00:00', '22:00:00', 8, 34, 12, 14),
+(14, 21, '14:00:00', '22:00:00', 9, 27, 20, 12),
+(15, 7, '6:00:00', '14:00:00', 8, 4, 8, 5),
+(13, 4, '6:00:00', '14:00:00', 8, 4, 10, 5),
+(14, 17, '14:00:00', '22:00:00', 8, 3, 11, 4),
+(15, 11, '14:00:00', '22:00:00', 6, 9, 12, 3),
+(15, 17, '22:00:00', '6:00:00', 1, 15, 7, 3),
+(22, 9, '6:00:00', '14:00:00', 2, 22, 7, 8),
+(17, 2, '14:00:00', '22:00:00', 4, 14, 5, 14),
+(18, 19, '6:00:00', '14:00:00', 9, 22, 7, 10),
+(19, 13, '22:00:00', '6:00:00', 8, 20, 8, 10),
+(21, 7, '7:00:00', '15:00:00', 6, 9, 12, 13),
+(21, 22, '15:00:00', '23:00:00', 5, 3, 14, 15)
 
 -- 1. Tuần tính từ:
 	-- Từ thứ 2 đến hết chủ nhật -> gọi là tuần chẵn
@@ -528,7 +336,7 @@ BEGIN
 	GROUP BY NhanCong.maNhanCong,NhanCong.hoTen, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
 END
 
-EXEC NhatKySanLuongKhoan_TheoThang @MaNhanCong = 7, @ThangLamViec = '2018-7-1'
+EXEC NhatKySanLuongKhoan_TheoThang @MaNhanCong = 7, @ThangLamViec = '2020-7-1'
 GO
 
 CREATE PROCEDURE NhatKySanLuongKhoan_TheoThang_Update
@@ -606,13 +414,13 @@ BEGIN
 		END
 END
 
-EXEC NhatKySanLuongKhoan_Tuan_Update @MaNhanCong=0, @Date = '2019-10-25'
+EXEC NhatKySanLuongKhoan_Tuan_Update @MaNhanCong=0, @Date = '2020-10-25'
 GO
 
 --2. Hiển thị thông tin công việc có nhiều NKSLK nhất
-SELECT CongViec.maCongViec, CongViec.tenCongViec, Count(DanhMucKhoan_ChiTiet.maNKSLK) AS SoLuong
-FROM CongViec JOIN DanhMucKhoan_ChiTiet
-ON CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+SELECT CongViec.maCongViec, CongViec.tenCongViec, Count(NKSLK_ChiTiet.maNKSLK) AS SoLuong
+FROM CongViec JOIN NKSLK_ChiTiet
+ON CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
 GROUP BY CongViec.maCongViec, CongViec.tenCongViec
 ORDER BY SoLuong DESC
 
@@ -672,15 +480,17 @@ CREATE PROCEDURE NKSLK_NhaMay
 	@ThangLamViec DATETIME
 AS
 BEGIN
-	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
-	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
+	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, SanPham.maSanPham, SanPham.tenSanPham, 
+		NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	FROM NKSLK, NKSLK_ChiTiet, NhanCong, CongViec, SanPham
 	WHERE 
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 	AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
-	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
-	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+	AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
+	AND SanPham.maSanPham = NKSLK_ChiTiet.maSanPham
 	AND NKSLK.ngay BETWEEN @ThangLamViec-DAY(@ThangLamViec)+1 and EOMONTH(@ThangLamViec)
-	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, 
+	tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, SanPham.maSanPham, tenSanPham
 END
 
 EXEC NKSLK_NhaMay @ThangLamViec = '2019-07-01'
@@ -692,49 +502,49 @@ BEGIN
 	DECLARE @FirstDate DATETIME
 	DECLARE @LastDate DATETIME
 	SELECT @FirstDate = firstDate, @LastDate = lastDate FROM [GetWeekDay_Func](@Date)
-	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
-	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
+	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, 
+	NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, SanPham.maSanPham, SanPham.tenSanPham
+	FROM NKSLK, NKSLK_ChiTiet, NhanCong, CongViec, SanPham
 	WHERE 
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 	AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
-	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
-	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+	AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
+	AND SanPham.maSanPham = NKSLK_ChiTiet.maSanPham
 	AND NKSLK.ngay BETWEEN @FirstDate and @LastDate
-	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, 
+	NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, SanPham.maSanPham, tenSanPham
 END
 
-EXEC NKSLK_NhaMay_Tuan @Date ='2019-10-25'
+EXEC NKSLK_NhaMay_Tuan @Date ='2020-07-01'
 
 --12. Hiển thị bảng lương sản phẩm của toàn bộ công nhân trong nhà máy theo tuần, theo tháng
-DECLARE @DATE DATETIME ='2018-7-1';
+DECLARE @DATE DATETIME ='2020-7-1';
 WITH NKSLK_KhoanChung(maCongViec, maNKSLK, SoLuong) AS (
 	SELECT CongViec.maCongViec, NKSLK.maNKSLK, Count(NhanCong.maNhanCong) AS SoLuong
-	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
+	FROM NKSLK, NKSLK_ChiTiet, NhanCong, CongViec
 	WHERE
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 	AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
-	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
-	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+	AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
 	AND NKSLK.ngay BETWEEN @DATE-DAY(@DATE)+1 and EOMONTH(@DATE)
 	GROUP BY CongViec.maCongViec, NKSLK.maNKSLK
 )
 SELECT NhanCong.hoTen,
 (
 	CASE WHEN (NKSLK_KhoanChung.SoLuong = 1)
-	THEN FORMAT(SUM((DanhMucKhoan_ChiTiet.sanLuongThucTe * CongViec.donGia)), '0,#')
-	ELSE FORMAT(SUM((DanhMucKhoan_ChiTiet.sanLuongThucTe * CongViec.donGia) * DATEDIFF(HOUR, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc) / 8), '0,#')
+	THEN FORMAT(SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia)), '0,#')
+	ELSE FORMAT(SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia) * DATEDIFF(HOUR, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc) / 8), '0,#')
 	END
 )
-FROM NKSLK_KhoanChung, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
+FROM NKSLK_KhoanChung, NKSLK_ChiTiet, NhanCong, CongViec
 WHERE 
 NKSLK_KhoanChung.maNKSLK = NKSLK_ChiTiet.maNKSLK
 AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
-AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
-AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
 GROUP BY NhanCong.hoTen, NKSLK_KhoanChung.SoLuong
 
 --13. Hiển thị số ngày công đi làm trong tháng
---CREATE VIEW NgayCong AS 
+CREATE VIEW NgayCong AS 
 SELECT NhanCong.maNhanCong, hoTen, count(NhanCong.maNhanCong) AS ngayCong 
 FROM NKSLK_ChiTiet 
 JOIN NhanCong ON NhanCong.maNhanCong = NKSLK_ChiTiet.maNhanCong
@@ -743,7 +553,7 @@ WHERE DATEDIFF(HOUR, gioBatDau, gioKetThuc) >= 8 and DATEPART(HOUR, gioBatDau) !
 AND NKSLK.ngay BETWEEN DATEADD(month, DATEDIFF(month, 0, '2019-7-1'), 0) and EOMONTH('2019-7-1')
 GROUP BY NhanCong.maNhanCong, hoTen;
 
---CREATE VIEW NgayCongLamThem AS
+CREATE VIEW NgayCongLamThem AS
 SELECT NhanCong.maNhanCong, hoTen, count(NhanCong.maNhanCong) * 1.3 AS ngayCong FROM NKSLK_ChiTiet 
 JOIN NhanCong ON NhanCong.maNhanCong = NKSLK_ChiTiet.maNhanCong
 JOIN NKSLK ON NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK

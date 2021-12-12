@@ -19,7 +19,7 @@ function index() {
 
   useEffect(() => {
     getSLKList();
-  }, [date, sort, showEditProfileModal]);
+  }, [date, sort]);
 
   const getSLKList = async () => {
     getListSLK(selectThang, date, currentPage - 1, pageSize, search, sort)
@@ -35,31 +35,27 @@ function index() {
 
   const columns = [
     {
-      title: 'Mã NKSLK',
+      title: 'Ma NKSLK',
       dataIndex: 'maNKSLK',
     },
     {
-      title: 'Họ Tên',
+      title: 'Ho Ten',
       dataIndex: 'hoTen',
     },
     {
-      title: 'Tên Công Việc',
+      title: 'Ten Cong Viec',
       dataIndex: 'tenCongViec',
     },
     {
-      title: 'Tên Sản Phẩm',
-      dataIndex: 'tenSanPham',
-    },
-    {
-      title: 'Ngày',
+      title: 'Ngay',
       dataIndex: 'ngay',
     },
     {
-      title: 'Giờ Bắt Đầu',
+      title: 'Gio Bat Dau',
       dataIndex: 'gioBatDau',
     },
     {
-      title: 'Giờ Kết Thúc',
+      title: 'Gio Ket Thuc',
       dataIndex: 'gioKetThuc',
     },
   ];

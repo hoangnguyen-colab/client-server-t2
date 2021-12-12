@@ -4,6 +4,7 @@ import withAuth from '@hocs/withAuth';
 import { Table, Space, Pagination, DatePicker, Input, Button, Select, Modal } from 'antd';
 import { deleteSanPham, getListSanPham } from '@core/services/API';
 import ModalEditProduct from './ModalEditProduct';
+import ModalCreateProduct from './ModalCreateProduct';
 const { Option } = Select;
 
 const sortSelect = [
@@ -39,6 +40,7 @@ function index() {
   const [sort, setSort] = useState<string>('id_asc');
   const [productID, setProductID] = useState<string>('');
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openCreateModal, setOpenCreateModal] = useState<boolean>(false);
 
   useEffect(() => {
     getProductList();
@@ -75,6 +77,14 @@ function index() {
   const handleSubmitModal = () => {
     setOpenModal(false);
     getProductList();
+  };
+
+  const handleCloseCreateModal = () => {
+    setOpenCreateModal(false);
+  };
+
+  const handleOpenCreateModal = () => {
+    setOpenCreateModal(true);
   };
 
   const columns = [
@@ -132,6 +142,9 @@ function index() {
   return (
     <Layout title={'Product'}>
       <div>
+        <Button type="primary" onClick={handleOpenCreateModal}>
+          Create
+        </Button>
         <Input placeholder={'Search'} onChange={handleSearchChange} width="50%" />
         <Button type="primary" onClick={getProductList}>
           Search
@@ -159,7 +172,7 @@ function index() {
         <Modal
           width={755}
           bodyStyle={{ height: 'max-content' }}
-          title={'Detail of staff'}
+          title={'Detail of product'}
           visible={openModal}
           onCancel={() => setOpenModal(false)}
           onOk={() => setOpenModal(false)}
@@ -168,6 +181,19 @@ function index() {
           className="edit-profile-modal"
         >
           <ModalEditProduct maSanPham={productID} onCloseModal={() => setOpenModal(false)} />
+        </Modal>
+        <Modal
+          width={755}
+          bodyStyle={{ height: 'max-content' }}
+          title={'Add Product'}
+          visible={openCreateModal}
+          onCancel={handleCloseCreateModal}
+          onOk={() => setOpenCreateModal(false)}
+          destroyOnClose
+          footer={null}
+          className="edit-profile-modal"
+        >
+          <ModalCreateProduct onCloseModal={() => setOpenCreateModal(false)} />
         </Modal>
       </div>
     </Layout>
