@@ -2,7 +2,8 @@ import axios from 'axios';
 import * as RequestInterceptor from '../../network/interceptors/request';
 import * as ResponseInterceptor from '../../network/interceptors/response';
 
-const BASE_URL = 'https://client-server-t2.somee.com/';
+// const BASE_URL = 'https://client-server-t2.somee.com/';
+const BASE_URL_LOCAL = 'https://localhost:44319/';
 
 const getInstance = (baseUrl: string) => {
   const instance = axios.create({
@@ -19,4 +20,4 @@ const getInstance = (baseUrl: string) => {
   return instance;
 };
 
-export const apiClient = getInstance(BASE_URL);
+export const apiClient = getInstance(BASE_URL_LOCAL);

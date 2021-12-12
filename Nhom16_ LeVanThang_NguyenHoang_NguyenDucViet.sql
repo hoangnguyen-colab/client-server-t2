@@ -660,27 +660,30 @@ FROM NhanCong
 WHERE DATEDIFF(DAY, ngaySinh, GETDATE()) BETWEEN 30 * 365 AND 45 * 365
 
 -- 10. Hiển thị danh mục công nhân có NKSLK được thực hiện ở ca 3
-SELECT nc.maNhanCong, nc.hoTen
+SELECT nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan
 FROM NhanCong nc, NKSLK_ChiTiet ct, NKSLK nk
 WHERE nc.maNhanCong = ct.maNhanCong AND nk.maNKSLK = ct.maNKSLK
 AND CONVERT(TIME, ct.gioBatDau) >= CONVERT(TIME, '22:00:00')
 AND CONVERT(TIME, ct.gioKetThuc) <= CONVERT(TIME, '6:00:00')
-GROUP BY nc.maNhanCong, nc.hoTen
+GROUP BY nc.maNhanCong, nc.hoTen, nc.ngaySinh, nc.queQuan
 
 --11. Hiển thị danh mục NKSLK của toàn bộ công nhân trong nhà máy theo tuần, tháng.
 CREATE PROCEDURE NKSLK_NhaMay 
 	@ThangLamViec DATETIME
 AS
 BEGIN
-	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
-	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
+	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, SanPham.maSanPham, SanPham.tenSanPham, 
+		NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec, SanPham
 	WHERE 
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 	AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
 	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
 	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+	AND SanPham.maSanPham = DanhMucKhoan_ChiTiet.maSanPham
 	AND NKSLK.ngay BETWEEN @ThangLamViec-DAY(@ThangLamViec)+1 and EOMONTH(@ThangLamViec)
-	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, 
+	tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, SanPham.maSanPham, tenSanPham
 END
 
 EXEC NKSLK_NhaMay @ThangLamViec = '2019-07-01'
@@ -692,15 +695,18 @@ BEGIN
 	DECLARE @FirstDate DATETIME
 	DECLARE @LastDate DATETIME
 	SELECT @FirstDate = firstDate, @LastDate = lastDate FROM [GetWeekDay_Func](@Date)
-	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
-	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec
+	SELECT NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, CongViec.tenCongViec, NKSLK.ngay, 
+	NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, SanPham.maSanPham, SanPham.tenSanPham
+	FROM NKSLK, NKSLK_ChiTiet, NhanCong, DanhMucKhoan_ChiTiet, CongViec, SanPham
 	WHERE 
 	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 	AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
 	AND NKSLK_ChiTiet.maNKSLK = DanhMucKhoan_ChiTiet.maNKSLK
 	AND CongViec.maCongViec = DanhMucKhoan_ChiTiet.maCongViec
+	AND SanPham.maSanPham = DanhMucKhoan_ChiTiet.maSanPham
 	AND NKSLK.ngay BETWEEN @FirstDate and @LastDate
-	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc
+	GROUP BY NKSLK.maNKSLK, NhanCong.maNhanCong, NhanCong.hoTen, CongViec.maCongViec, tenCongViec, NKSLK.ngay, 
+	NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc, SanPham.maSanPham, tenSanPham
 END
 
 EXEC NKSLK_NhaMay_Tuan @Date ='2019-10-25'
