@@ -28,7 +28,13 @@ const tailFormItemLayout = {
   },
 };
 
-function index() {
+interface IStaffInfo {
+  maSanPham?: string;
+  onCloseModal: () => void;
+  onSubmitAndReload?: () => void;
+}
+
+const ModalCreateProduct: React.FC<IStaffInfo> = ({ onCloseModal }) => {
   const router = useRouter();
   const { id } = router.query;
   const [form] = Form.useForm();
@@ -40,6 +46,7 @@ function index() {
         router.push('/sanpham');
         if (data) {
           console.log(`data`, data);
+          onCloseModal();
         }
       })
       .catch((error) => {
@@ -48,31 +55,29 @@ function index() {
   };
 
   return (
-    <Layout title={'Product'}>
-      <Form {...formItemLayout} form={form} name="register" onFinish={handleAddProduct} scrollToFirstError>
-        <Form.Item name="tenSanPham" label="tenSanPham">
-          <Input />
-        </Form.Item>
-        <Form.Item name="soDangKy" label="soDangKy" preserve>
-          <Input />
-        </Form.Item>
-        <Form.Item name="ngayDangKy" label="ngayDangKy" preserve>
-          <Input disabled={true} />
-        </Form.Item>
-        <Form.Item name="ngaySanXuat" label="ngaySanXuat" preserve>
-          <Input disabled={true} />
-        </Form.Item>
+    <Form {...formItemLayout} form={form} name="register" onFinish={handleAddProduct} scrollToFirstError>
+      <Form.Item name="tenSanPham" label="tenSanPham">
+        <Input />
+      </Form.Item>
+      <Form.Item name="soDangKy" label="soDangKy" preserve>
+        <Input />
+      </Form.Item>
+      <Form.Item name="ngayDangKy" label="ngayDangKy" preserve>
+        <Input disabled={true} />
+      </Form.Item>
+      <Form.Item name="ngaySanXuat" label="ngaySanXuat" preserve>
+        <Input disabled={true} />
+      </Form.Item>
 
-        <Form.Item {...tailFormItemLayout}>
-          <Space>
-            <Button type="primary" htmlType="submit">
-              Create
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
-    </Layout>
+      <Form.Item {...tailFormItemLayout}>
+        <Space>
+          <Button type="primary" htmlType="submit">
+            Create
+          </Button>
+        </Space>
+      </Form.Item>
+    </Form>
   );
-}
+};
 
-export default withAuth(index);
+export default withAuth(ModalCreateProduct);

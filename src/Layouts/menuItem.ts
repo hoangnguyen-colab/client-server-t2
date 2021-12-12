@@ -33,16 +33,7 @@ const items: MenuItemType[] = [
   {
     title: 'Sản Phẩm',
     icon: { name: 'star-outline' },
-    children: [
-      {
-        title: 'Thêm mới',
-        link: { href: '/sanpham/create' },
-      },
-      {
-        title: 'Danh sách',
-        link: { href: '/sanpham' },
-      },
-    ],
+    link: { href: '/sanpham' },
   },
   {
     title: 'Thống kê',

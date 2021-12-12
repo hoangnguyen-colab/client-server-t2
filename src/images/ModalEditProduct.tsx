@@ -8,7 +8,7 @@ import { getSanPham, editSanPham } from '@core/services/API';
 
 interface IStaffInfo {
   maSanPham?: string;
-  onCloseModal: () => void;
+  onCloseModal?: () => void;
   onSubmitAndReload?: () => void;
 }
 
@@ -69,7 +69,6 @@ const ModalEditStaffInfo: React.FC<IStaffInfo> = ({ maSanPham, onCloseModal, onS
     editSanPham(values, maSanPham!.toString())
       .then((resp) => {
         console.log(resp.data);
-        onCloseModal();
       })
       .catch((error) => {
         console.log('error', error);
