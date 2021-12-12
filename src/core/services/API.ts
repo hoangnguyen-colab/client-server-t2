@@ -38,5 +38,27 @@ export const getNgayCong = (date: string) => get(`${ENDPOINTS.NGAYCONG}?date=${d
 export const getListCongViec = (pageIndex?: number, pageSize?: number, search: string = '', sort: string = 'id_asc') =>
   get(`${ENDPOINTS.CONGVIEC}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
 
+export const getListMost = (dongia?: string) => {
+  let query = `${ENDPOINTS.CONGVIEC}/most`;
+  if (dongia != null) {
+    query += `?dongia=${dongia}`;
+  }
+  return get(query);
+};
+
+export const getListAVG = (type?: string) => {
+  let query = `${ENDPOINTS.CONGVIEC}/avg`;
+  if (type != null) {
+    query += `?type=${type}`;
+  }
+  return get(query);
+};
+
+export const getListSLKMost = () => get(`${ENDPOINTS.CONGVIEC}/slk_most`);
+
 export const getListNhanCong = (pageIndex?: number, pageSize?: number, search: string = '', sort: string = 'id_asc') =>
   get(`${ENDPOINTS.NHANCONG}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}&search=${search}`);
+
+export const getNhanCongRetired = (gender?: string) => get(`${ENDPOINTS.NHANCONG}/retired?gender=${gender}`);
+export const getNhanCongAge = (start?: number, end?: number) =>
+  get(`${ENDPOINTS.NHANCONG}/age?start=${start}&end=${end}`);

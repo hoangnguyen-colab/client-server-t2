@@ -14,7 +14,16 @@ const items: MenuItemType[] = [
   {
     title: 'Công Việc',
     icon: { name: 'edit-2-outline' },
-    link: { href: '/congviec' },
+    children: [
+      {
+        title: 'Thống kê',
+        link: { href: '/congviec/report' },
+      },
+      {
+        title: 'Danh sách',
+        link: { href: '/congviec' },
+      },
+    ],
   },
   // {
   //   title: 'Sản Phẩm',
@@ -23,8 +32,17 @@ const items: MenuItemType[] = [
   // },
   {
     title: 'Nhân Công',
-    icon: { name: 'edit-2-outline' },
-    link: { href: '/nhancong' },
+    icon: { name: 'star-outline' },
+    children: [
+      {
+        title: 'Thống kê',
+        link: { href: '/nhancong/report' },
+      },
+      {
+        title: 'Danh sách',
+        link: { href: '/nhancong' },
+      },
+    ],
   },
   // {
   //   title: 'FEATURES',
