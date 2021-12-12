@@ -62,3 +62,4 @@ export const getListNhanCong = (pageIndex?: number, pageSize?: number, search: s
 export const getNhanCongRetired = (gender?: string) => get(`${ENDPOINTS.NHANCONG}/retired?gender=${gender}`);
 export const getNhanCongAge = (start?: number, end?: number) =>
   get(`${ENDPOINTS.NHANCONG}/age?start=${start}&end=${end}`);
+export const getNhanCongShift = (caLam?: number) => get(`${ENDPOINTS.NHANCONG}/shift?caLam=${caLam}`);

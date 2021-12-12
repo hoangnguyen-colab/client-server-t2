@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
 import { Table, Typography, InputNumber, Pagination, Input, Button, Select } from 'antd';
-import { getNhanCongRetired, getNhanCongAge } from '@core/services/API';
+import { getNhanCongRetired, getNhanCongAge, getNhanCongShift } from '@core/services/API';
 const { Option } = Select;
 const { Title } = Typography;
 
@@ -120,6 +120,57 @@ const NhanCongAge = () => {
   );
 };
 
+const NhanCongShift = () => {
+  const [productData, setProductData] = useState<any>();
+  const [caLam, setCaLam] = useState<any>(1);
+
+  useEffect(() => {
+    getNhanCongList();
+  }, [caLam]);
+
+  const getNhanCongList = async () => {
+    getNhanCongShift(caLam)
+      .then((resp) => {
+        const data = resp.data;
+        setProductData(data.Data);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
+
+  const columns = [
+    {
+      title: 'Mã nhân công',
+      dataIndex: 'maNhanCong',
+    },
+    {
+      title: 'Họ tên',
+      dataIndex: 'hoTen',
+    },
+    {
+      title: 'Ngày sinh',
+      dataIndex: 'ngaySinh',
+    },
+    {
+      title: 'Quê quán',
+      dataIndex: 'queQuan',
+    },
+  ];
+
+  return (
+    <div>
+      <Title level={2}>Công nhân ca làm</Title>
+      <Select defaultValue={1} style={{ width: 120 }} onChange={(value) => setCaLam(value)}>
+        <Option value={1}>Ca 1: 6h - 14h</Option>
+        <Option value={2}>Ca 2: 14h - 22h</Option>
+        <Option value={3}>Ca 3: 22h - 6h</Option>
+      </Select>
+      <Table columns={columns} dataSource={productData} pagination={false} />
+    </div>
+  );
+};
+
 function index() {
   return (
     <>
@@ -130,6 +181,10 @@ function index() {
         <br />
         <div>
           <NhanCongAge />
+        </div>
+        <br />
+        <div>
+          <NhanCongShift />
         </div>
       </Layout>
     </>
