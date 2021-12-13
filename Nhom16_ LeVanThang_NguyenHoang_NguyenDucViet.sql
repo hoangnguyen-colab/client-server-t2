@@ -532,10 +532,10 @@ WITH NKSLK_KhoanChung(maCongViec, maNKSLK, SoLuong) AS (
 SELECT NhanCong.hoTen,
 (
 	CASE WHEN (NKSLK_KhoanChung.SoLuong = 1)
-	THEN FORMAT(SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia)), '0,#')
-	ELSE FORMAT(SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia) * DATEDIFF(HOUR, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc) / 8), '0,#')
+	THEN SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia))
+	ELSE SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia) * ABS(DATEDIFF(HOUR, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc) / 8))
 	END
-)
+) as Luong
 FROM NKSLK_KhoanChung, NKSLK_ChiTiet, NhanCong, CongViec
 WHERE 
 NKSLK_KhoanChung.maNKSLK = NKSLK_ChiTiet.maNKSLK
@@ -543,30 +543,54 @@ AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
 AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
 GROUP BY NhanCong.hoTen, NKSLK_KhoanChung.SoLuong
 
+
 --13. Hiển thị số ngày công đi làm trong tháng
-CREATE VIEW NgayCong AS 
-SELECT NhanCong.maNhanCong, hoTen, count(NhanCong.maNhanCong) AS ngayCong 
+WITH TongNgayCong AS (
+	(SELECT NhanCong.maNhanCong, hoTen, count(NhanCong.maNhanCong) AS ngayCong 
 FROM NKSLK_ChiTiet 
 JOIN NhanCong ON NhanCong.maNhanCong = NKSLK_ChiTiet.maNhanCong
 JOIN NKSLK ON NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 WHERE DATEDIFF(HOUR, gioBatDau, gioKetThuc) >= 8 and DATEPART(HOUR, gioBatDau) != 22
-AND NKSLK.ngay BETWEEN DATEADD(month, DATEDIFF(month, 0, '2019-7-1'), 0) and EOMONTH('2019-7-1')
-GROUP BY NhanCong.maNhanCong, hoTen;
-
-CREATE VIEW NgayCongLamThem AS
+AND NKSLK.ngay BETWEEN DATEADD(month, DATEDIFF(month, 0, '2020-7-1'), 0) and EOMONTH('2020-7-1')
+GROUP BY NhanCong.maNhanCong, hoTen)
+	UNION
+	(
 SELECT NhanCong.maNhanCong, hoTen, count(NhanCong.maNhanCong) * 1.3 AS ngayCong FROM NKSLK_ChiTiet 
 JOIN NhanCong ON NhanCong.maNhanCong = NKSLK_ChiTiet.maNhanCong
 JOIN NKSLK ON NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
 WHERE DATEDIFF(HOUR, gioKetThuc, gioBatDau) >= 8 and DATEPART(HOUR, gioBatDau) = 22
-AND NKSLK.ngay BETWEEN DATEADD(month, DATEDIFF(month, 0, '2019-7-1'), 0) and EOMONTH('2019-7-1')
-GROUP BY NhanCong.maNhanCong, hoTen;
-
-WITH TongNgayCong AS (
-	SELECT * FROM NgayCongLamThem
-	UNION
-	SELECT * FROM NgayCong
+AND NKSLK.ngay BETWEEN DATEADD(month, DATEDIFF(month, 0, '2020-7-1'), 0) and EOMONTH('2020-7-1')
+GROUP BY NhanCong.maNhanCong, hoTen)
 	) 
 SELECT TongNgayCong.maNhanCong, TongNgayCong.hoTen, SUM(TongNgayCong.ngayCong) as Cong
 FROM TongNgayCong
 GROUP BY TongNgayCong.maNhanCong, TongNgayCong.hoTen
+
+--14. Hiển thị thông tin lương sản phẩm của công nhân có lương sản
+--phẩm cao nhất, ít nhất.
+DECLARE @DATE DATETIME ='2020-7-1';
+WITH NKSLK_KhoanChung(maCongViec, maNKSLK, SoLuong) AS (
+	SELECT CongViec.maCongViec, NKSLK.maNKSLK, Count(NhanCong.maNhanCong) AS SoLuong
+	FROM NKSLK, NKSLK_ChiTiet, NhanCong, CongViec
+	WHERE
+	NKSLK.maNKSLK = NKSLK_ChiTiet.maNKSLK
+	AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
+	AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
+	AND NKSLK.ngay BETWEEN @DATE-DAY(@DATE)+1 and EOMONTH(@DATE)
+	GROUP BY CongViec.maCongViec, NKSLK.maNKSLK
+)
+SELECT top 1 NhanCong.hoTen, 
+(
+	CASE WHEN (NKSLK_KhoanChung.SoLuong = 1)
+	THEN SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia))
+	ELSE SUM((NKSLK_ChiTiet.sanLuongThucTe * CongViec.donGia) * ABS(DATEDIFF(HOUR, NKSLK_ChiTiet.gioBatDau, NKSLK_ChiTiet.gioKetThuc) / 8))
+	END
+) as Luong
+FROM NKSLK_KhoanChung, NKSLK_ChiTiet, NhanCong, CongViec
+WHERE 
+NKSLK_KhoanChung.maNKSLK = NKSLK_ChiTiet.maNKSLK
+AND NKSLK_ChiTiet.maNhanCong = NhanCong.maNhanCong
+AND CongViec.maCongViec = NKSLK_ChiTiet.maCongViec
+GROUP BY NhanCong.hoTen, NKSLK_KhoanChung.SoLuong
+ORDER BY Luong DESC
 
