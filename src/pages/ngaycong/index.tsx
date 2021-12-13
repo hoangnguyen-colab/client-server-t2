@@ -27,7 +27,7 @@ function index() {
   const columns = [
     {
       title: 'ID',
-      dataIndex: 'id',
+      dataIndex: 'maNhanCong',
     },
     {
       title: 'Ho Ten',
@@ -39,13 +39,13 @@ function index() {
     },
   ];
   function onChange(date: any, dateString: any) {
-    const selectedDate = dateString.replaceAll('-', '');
+    const selectedDate = dateString.replaceAll('-', '') + '01';
     setDate(selectedDate);
   }
   return (
     <Layout title={'Staff'}>
       <div>
-        <DatePicker onChange={onChange} />
+        <DatePicker onChange={onChange} picker={'month'} />
       </div>
       <div>
         <Table columns={columns} dataSource={slkData} />
