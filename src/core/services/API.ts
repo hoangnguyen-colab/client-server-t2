@@ -72,6 +72,7 @@ export const getListNhanCong = (pageIndex?: number, pageSize?: number, search: s
 export const getNhanCongRetired = (gender?: string) => get(`${ENDPOINTS.NHANCONG}/retired?gender=${gender}`);
 export const getNhanCongAge = (start?: number, end?: number) =>
   get(`${ENDPOINTS.NHANCONG}/age?start=${start}&end=${end}`);
-export const getNhanCongShift = (caLam?: number) => get(`${ENDPOINTS.NHANCONG}/shift?caLam=${caLam}`);
+export const getNhanCongShift = (date: string, caLam?: number) =>
+  get(`${ENDPOINTS.NHANCONG}/shift?date=${date}&caLam=${caLam}`);
 
 export const getLuongSP = (date?: string, type?: string) => get(`${ENDPOINTS.LUONG}/sanpham?date=${date}&type=${type}`);

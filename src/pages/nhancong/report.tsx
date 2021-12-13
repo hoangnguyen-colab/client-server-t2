@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Layout from 'Layouts';
 import withAuth from '@hocs/withAuth';
-import { Table, Typography, InputNumber, Pagination, Input, Button, Select } from 'antd';
+import { Table, Typography, InputNumber, DatePicker, Input, Button, Select } from 'antd';
 import { getNhanCongRetired, getNhanCongAge, getNhanCongShift } from '@core/services/API';
 const { Option } = Select;
 const { Title } = Typography;
@@ -123,13 +123,14 @@ const NhanCongAge = () => {
 const NhanCongShift = () => {
   const [productData, setProductData] = useState<any>();
   const [caLam, setCaLam] = useState<any>(1);
+  const [date, setDate] = useState<any>('20200701');
 
   useEffect(() => {
     getNhanCongList();
-  }, [caLam]);
+  }, [caLam, date]);
 
   const getNhanCongList = async () => {
-    getNhanCongShift(caLam)
+    getNhanCongShift(date, caLam)
       .then((resp) => {
         const data = resp.data;
         setProductData(data.Data);
@@ -138,6 +139,11 @@ const NhanCongShift = () => {
         console.log('error', error);
       });
   };
+
+  function onDateChange(date: any, dateString: any) {
+    let selectedDate = dateString.replaceAll('-', '');
+    setDate(selectedDate);
+  }
 
   const columns = [
     {
@@ -161,6 +167,7 @@ const NhanCongShift = () => {
   return (
     <div>
       <Title level={2}>Công nhân ca làm</Title>
+      <DatePicker onChange={onDateChange} />
       <Select defaultValue={1} style={{ width: 120 }} onChange={(value) => setCaLam(value)}>
         <Option value={1}>Ca 1: 6h - 14h</Option>
         <Option value={2}>Ca 2: 14h - 22h</Option>
@@ -176,15 +183,15 @@ function index() {
     <>
       <Layout title={'Thong ke nhan cong'}>
         <div>
-          <NhanCongRetired />
-        </div>
-        <br />
-        <div>
           <NhanCongAge />
         </div>
         <br />
         <div>
           <NhanCongShift />
+        </div>
+        <br />
+        <div>
+          <NhanCongRetired />
         </div>
       </Layout>
     </>
