@@ -33,6 +33,8 @@ export const getSanPhamNDK = (date: string) => get(`${ENDPOINTS.SANPHAM}/${date}
 export const editSanPham = (params: object, id: string) => post(`${ENDPOINTS.SANPHAM}/edit/${id}`, params);
 export const addSanPham = (params: object) => post(`${ENDPOINTS.SANPHAM}/add`, params);
 export const deleteSanPham = (id: string) => apiClient.delete(`${ENDPOINTS.SANPHAM}/delete/${id}`);
+export const getListExpiryDate = (dayLefts: number) => get(`${ENDPOINTS.SANPHAM}/hsd?daysLeft=${dayLefts}`);
+export const getListRegistration = (day: string) => get(`${ENDPOINTS.SANPHAM}/ndk?day=${day}`);
 export const getNgayCong = (date: string) => get(`${ENDPOINTS.NGAYCONG}?date=${date}`);
 
 //api cong viec

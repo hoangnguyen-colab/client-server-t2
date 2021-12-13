@@ -128,7 +128,8 @@ function index() {
   function onChange(date: any, dateString: any) {
     const selectedDate = dateString.replaceAll('-', '');
     console.log(dateString.replaceAll('-', ''));
-    setDate(selectedDate);
+    console.log(`selectedDate`, selectedDate);
+    setDate(dateString);
   }
 
   const handleSearchChange = ({ target }: any) => {
